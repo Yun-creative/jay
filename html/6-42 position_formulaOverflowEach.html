@@ -1,0 +1,81 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>CSS3 Property Basic</title>
+    <style>
+        .box { 
+            width: 100px; height: 100px; 
+            position: absolute;
+        }
+        .box:nth-child(1) {
+            background-color: red;
+            left: 10px; top: 10px;
+
+            z-index: 7; /* z축으로 생각해서 높을 수록 위에 있음 레이어 아래로 보내기 이런 느낌 */
+        }
+        .box:nth-child(2) {
+            background-color: orange;
+            left: 50px; top: 50px;
+
+            z-index: 6;
+        }
+        .box:nth-child(3) { 
+            background-color: yellow;
+            left: 90px; top: 90px;
+
+            z-index: 5; 
+        }
+
+        .box:nth-child(4) { 
+            background-color: green;
+            left: 130px; top: 130px;
+
+            z-index: 4; 
+        }
+
+        .box:nth-child(5) { 
+            background-color: blue;
+            left: 170px; top: 170px;
+
+            z-index: 3; 
+        }
+
+        .box:nth-child(6) { 
+            background-color: darkblue;
+            left: 210px; top: 210px;
+
+            z-index: 2; 
+        }
+
+        .box:nth-child(7) { 
+            background-color: purple;
+            left: 250px; top: 250px;
+
+            z-index: 1; 
+        }
+
+        body > div { /* 부모 속성 !! */
+            width: 300px; height: 200px;
+            border: 3px solid black;
+            
+            position: relative;
+            overflow-x: scroll; /* 스크롤 형식 x바*/
+            overflow-y: scroll; /* 스크롤 형식 y바*/
+            
+        }
+    </style>
+</head>
+<body>
+    <h1>Lorem ipsum dolor amet</h1>
+    <div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+        <div class="box"></div>
+    </div>
+    <h1>Lorem ipsum dolor amet</h1>
+</body>
+</html>
