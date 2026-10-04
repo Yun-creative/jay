@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#efe6d5" />
+  <title>소식을 전합니다</title>
+  <style>
+    :root {
+      --ink: #2f2922;
+      --muted: #756a5f;
+      --paper: #f8f0df;
+      --paper-deep: #eadcc4;
+      --wood: #4b3a2f;
+      --seal: #9f2f2c;
+      --sky-top: #d9e5eb;
+      --sky-bottom: #f4ead9;
+      --shadow: rgba(47, 41, 34, 0.22);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      width: 100%;
+      min-height: 100%;
+      margin: 0;
+    }
+
+    body {
+      min-height: 100svh;
+      overflow-x: hidden;
+      font-family: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", system-ui, -apple-system, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 15% 15%, rgba(255,255,255,.7), transparent 22%),
+        linear-gradient(180deg, var(--sky-top), var(--sky-bottom) 62%, #e1ccb0 100%);
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .22;
+      background-image:
+        repeating-linear-gradient(0deg, rgba(57,43,31,.06) 0 1px, transparent 1px 4px),
+        repeating-linear-gradient(90deg, rgba(57,43,31,.025) 0 1px, transparent 1px 6px);
+      mix-blend-mode: multiply;
+    }
+
+    .scene {
+      position: relative;
+      width: 100%;
+      min-height: 100vh;
+      min-height: 100svh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: max(24px, env(safe-area-inset-top)) 18px max(34px, env(safe-area-inset-bottom));
+      isolation: isolate;
+      overflow: hidden;
+    }
+
+    .scene::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: -1;
+      background: radial-gradient(ellipse at center, transparent 38%, rgba(72,52,36,.06) 100%);
+    }
+
+    .cloud {
+      position: absolute;
+      width: 260px;
+      height: 72px;
+      opacity: .28;
+      filter: blur(.2px);
+      animation: drift 18s linear infinite;
+      pointer-events: none;
+    }
+
+    .cloud::before,
+    .cloud::after,
+    .cloud span {
+      content: "";
+      position: absolute;
+      border-radius: 999px;
+      background: #fff;
+      box-shadow: 0 8px 24px rgba(255,255,255,.22);
+    }
+
+    .cloud::before { width: 100px; height: 52px; left: 20px; top: 20px; }
+    .cloud::after { width: 132px; height: 62px; left: 88px; top: 6px; }
+    .cloud span { width: 120px; height: 46px; left: 120px; top: 26px; }
+
+    .cloud.one { top: 12%; left: -70px; }
+    .cloud.two { top: 29%; right: -120px; transform: scale(.72); animation-duration: 24s; animation-delay: -7s; }
+
+    @keyframes drift {
+      from { translate: -12px 0; }
+      50% { translate: 22px 4px; }
+      to { translate: -12px 0; }
+    }
+
+    .landing {
+      width: min(680px, 100%);
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      transition: opacity .55s ease, transform .55s ease, filter .55s ease;
+    }
+
+    .landing.hide {
+      opacity: 0;
+      transform: translateY(16px) scale(.98);
+      filter: blur(4px);
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      margin: 0 0 14px;
+      padding: 7px 12px 6px;
+      border: 1px solid rgba(73,57,44,.12);
+      border-radius: 999px;
+      background: rgba(255,255,255,.26);
+      box-shadow: inset 0 1px rgba(255,255,255,.48);
+      font-size: 10px;
+      line-height: 1;
+      letter-spacing: .13em;
+      font-weight: 850;
+      color: rgba(47,41,34,.62);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 5px;
+      height: 5px;
+      flex: 0 0 5px;
+      border-radius: 50%;
+      background: #8e6f51;
+      box-shadow: 0 0 0 3px rgba(142,111,81,.10);
+    }
+
+    h1 {
+      max-width: 100%;
+      margin: 0;
+      font-family: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", system-ui, -apple-system, sans-serif;
+      font-size: clamp(30px, 5.2vw, 46px);
+      line-height: 1.13;
+      font-weight: 900;
+      letter-spacing: -.055em;
+      white-space: nowrap;
+      text-wrap: nowrap;
+      text-shadow: 0 1px 0 rgba(255,255,255,.72), 0 8px 26px rgba(59,43,31,.08);
+    }
+
+    .sub {
+      position: relative;
+      margin: 13px auto 0;
+      max-width: 420px;
+      padding-top: 13px;
+      font-size: 14px;
+      line-height: 1.65;
+      color: var(--muted);
+    }
+
+    .sub::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: 34px;
+      height: 1px;
+      transform: translateX(-50%);
+      background: linear-gradient(90deg, transparent, rgba(77,57,42,.28), transparent);
+    }
+
+    .bird-stage {
+      position: relative;
+      width: 100%;
+      height: clamp(210px, 34svh, 270px);
+      margin: 22px auto 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 1 auto;
+    }
+
+    .bird-wrap {
+      display: block;
+      width: min(360px, 86vw);
+      max-height: 100%;
+      animation: arrival 2.35s cubic-bezier(.18,.84,.25,1) both, hover 3.2s 2.35s ease-in-out infinite;
+      transform-origin: center;
+      filter: drop-shadow(0 18px 18px rgba(54,43,34,.16));
+    }
+
+    @keyframes arrival {
+      0% { transform: translate(120vw, -18vh) rotate(-10deg) scale(.6); opacity: 0; }
+      28% { opacity: 1; }
+      72% { transform: translate(-24px, 6px) rotate(3deg) scale(1.04); }
+      100% { transform: translate(0,0) rotate(0) scale(1); opacity: 1; }
+    }
+
+    @keyframes hover {
+      0%, 100% { transform: translateY(0) rotate(-.4deg); }
+      50% { transform: translateY(-8px) rotate(.5deg); }
+    }
+
+    .wing-left,
+    .wing-right {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: flap .5s ease-in-out infinite alternate;
+    }
+
+    .wing-right { animation-delay: -.16s; }
+
+    @keyframes flap {
+      from { transform: rotate(-6deg) translateY(0); }
+      to { transform: rotate(9deg) translateY(-2px); }
+    }
+
+    .scroll-mini {
+      animation: scrollSwing 1.6s ease-in-out infinite;
+      transform-origin: 50% 0%;
+    }
+
+    @keyframes scrollSwing {
+      0%, 100% { transform: rotate(-2deg); }
+      50% { transform: rotate(2deg) translateY(2px); }
+    }
+
+    .open-btn {
+      position: relative;
+      border: 0;
+      border-radius: 999px;
+      padding: 15px 26px;
+      font: inherit;
+      font-size: 16px;
+      font-weight: 800;
+      color: #fff9ed;
+      background: linear-gradient(180deg, #4b3c31, #2f2922);
+      box-shadow: 0 10px 26px rgba(47,41,34,.2), inset 0 1px rgba(255,255,255,.18);
+      cursor: pointer;
+      transition: transform .2s ease, box-shadow .2s ease;
+      overflow: hidden;
+    }
+
+    .open-btn::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(115deg, transparent 25%, rgba(255,255,255,.16) 45%, transparent 65%);
+      transform: translateX(-120%);
+      animation: shine 3.8s 2.4s infinite;
+    }
+
+    @keyframes shine {
+      0%, 58% { transform: translateX(-120%); }
+      80%, 100% { transform: translateX(120%); }
+    }
+
+    .open-btn:hover { transform: translateY(-2px); box-shadow: 0 13px 32px rgba(47,41,34,.26); }
+    .open-btn:active { transform: translateY(1px) scale(.985); }
+
+    .hint {
+      margin-top: 12px;
+      font-size: 12px;
+      color: rgba(47,41,34,.48);
+    }
+
+    .letter-shell {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: max(18px, env(safe-area-inset-top)) 16px max(18px, env(safe-area-inset-bottom));
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity .35s ease;
+    }
+
+    .letter-shell.show {
+      pointer-events: auto;
+      opacity: 1;
+    }
+
+    .letter {
+      position: relative;
+      width: min(680px, 100%);
+      max-height: calc(100vh - 56px);
+      max-height: calc(100svh - 56px);
+      overflow: auto;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+      padding: clamp(34px, 7vw, 62px) clamp(26px, 7vw, 64px) clamp(34px, 7vw, 58px);
+      border: 1px solid rgba(89,67,49,.22);
+      border-radius: 18px 18px 24px 24px;
+      background:
+        linear-gradient(rgba(255,255,255,.16), rgba(255,255,255,.16)),
+        repeating-linear-gradient(0deg, rgba(104,80,57,.034) 0 1px, transparent 1px 4px),
+        var(--paper);
+      box-shadow: 0 34px 80px rgba(55,40,29,.28), 0 3px 0 rgba(255,255,255,.55) inset, 0 0 0 1px rgba(255,255,255,.24) inset;
+      transform-origin: top center;
+      transform: perspective(1100px) rotateX(-84deg) translateY(-120px) scaleY(.6);
+      opacity: 0;
+    }
+
+    .letter-shell.show .letter {
+      animation: unroll 1.05s cubic-bezier(.18,.84,.25,1) .08s forwards;
+    }
+
+    @keyframes unroll {
+      0% { transform: perspective(1100px) rotateX(-84deg) translateY(-110px) scaleY(.55); opacity: 0; }
+      58% { transform: perspective(1100px) rotateX(8deg) translateY(6px) scaleY(1.02); opacity: 1; }
+      100% { transform: perspective(1100px) rotateX(0) translateY(0) scaleY(1); opacity: 1; }
+    }
+
+    .letter::before,
+    .letter::after {
+      content: "";
+      position: absolute;
+      left: 22px;
+      right: 22px;
+      height: 18px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, rgba(138,106,76,.14), rgba(255,255,255,.2));
+      filter: blur(.25px);
+      pointer-events: none;
+    }
+
+    .letter::before { top: -7px; box-shadow: 0 7px 12px rgba(64,46,32,.08); }
+    .letter::after { bottom: -7px; transform: rotate(180deg); box-shadow: 0 -7px 12px rgba(64,46,32,.08); }
+
+    .letter-top {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .letter-top .tiny {
+      display: inline-block;
+      margin-bottom: 10px;
+      font: 700 11px/1.2 system-ui, sans-serif;
+      letter-spacing: .22em;
+      color: #8b7a6c;
+    }
+
+    .letter-top h2 {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(28px, 5vw, 42px);
+      font-weight: 500;
+      letter-spacing: -.03em;
+    }
+
+    .divider {
+      width: 76px;
+      height: 1px;
+      margin: 22px auto 0;
+      background: linear-gradient(90deg, transparent, rgba(84,62,45,.42), transparent);
+    }
+
+    .letter-body {
+      font-family: "Nanum Myeongjo", "Batang", "AppleMyungjo", serif;
+      font-size: clamp(17px, 3.8vw, 20px);
+      line-height: 2.02;
+      letter-spacing: -.015em;
+      word-break: keep-all;
+      text-align: left;
+    }
+
+    .letter-body p {
+      margin: 0 0 1.28em;
+    }
+
+    .letter-body strong {
+      font-weight: 800;
+      color: #211c18;
+      background: linear-gradient(transparent 68%, rgba(173,122,69,.18) 68%);
+    }
+
+    .note {
+      margin-top: 26px;
+      padding: 15px 17px;
+      border-left: 3px solid rgba(107,72,45,.32);
+      background: rgba(111,83,58,.055);
+      border-radius: 0 10px 10px 0;
+      font-family: "Pretendard", system-ui, sans-serif;
+      font-size: 13px;
+      line-height: 1.7;
+      color: #77685b;
+    }
+
+    .seal {
+      width: 68px;
+      height: 68px;
+      margin: 28px auto 2px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 36% 30%, rgba(255,255,255,.18), transparent 24%),
+        radial-gradient(circle at center, #b13f39 0 44%, #8f2b28 45% 100%);
+      color: rgba(255,245,229,.92);
+      font-family: Georgia, serif;
+      font-size: 23px;
+      box-shadow: 0 7px 13px rgba(107,38,34,.25), inset 0 0 0 4px rgba(99,30,27,.22), inset 0 0 0 7px rgba(255,255,255,.05);
+      transform: rotate(-8deg);
+      user-select: none;
+    }
+
+    .close-btn {
+      display: block;
+      margin: 20px auto 0;
+      border: 1px solid rgba(71,54,41,.18);
+      background: rgba(255,255,255,.34);
+      color: #67584d;
+      border-radius: 999px;
+      padding: 10px 17px;
+      font: 700 12px/1 system-ui, sans-serif;
+      cursor: pointer;
+      backdrop-filter: blur(6px);
+    }
+
+    .close-btn:hover { background: rgba(255,255,255,.58); }
+
+    .feather {
+      position: fixed;
+      width: 18px;
+      height: 42px;
+      border-radius: 100% 0 100% 0;
+      background: linear-gradient(135deg, rgba(255,255,255,.5), rgba(94,80,70,.22));
+      opacity: 0;
+      pointer-events: none;
+      z-index: 6;
+    }
+
+    body.opened .feather { animation: featherFall 2.5s ease-in forwards; }
+    .f1 { left: 24%; top: 12%; animation-delay: .25s !important; }
+    .f2 { right: 22%; top: 17%; transform: scale(.7) rotate(25deg); animation-delay: .5s !important; }
+    .f3 { left: 48%; top: 4%; transform: scale(.55) rotate(-16deg); animation-delay: .7s !important; }
+
+    @keyframes featherFall {
+      0% { opacity: 0; transform: translateY(-10px) rotate(0); }
+      15% { opacity: .55; }
+      100% { opacity: 0; transform: translate(44px, 72vh) rotate(280deg); }
+    }
+
+    @media (max-width: 540px) {
+      .scene {
+        align-items: center;
+        padding: max(16px, env(safe-area-inset-top)) 14px max(22px, env(safe-area-inset-bottom));
+      }
+      .landing { min-height: calc(100svh - 38px); }
+      .eyebrow { margin-bottom: 12px; padding: 7px 11px 6px; font-size: 9px; }
+      h1 { font-size: clamp(27px, 8.7vw, 36px); line-height: 1.12; letter-spacing: -.06em; }
+      .sub { max-width: 330px; margin-top: 11px; padding: 12px 8px 0; font-size: 13px; line-height: 1.62; }
+      .bird-stage { height: clamp(195px, 31svh, 230px); margin-top: 14px; }
+      .bird-wrap { width: min(340px, 92vw); }
+      .open-btn { width: min(240px, 78vw); padding: 14px 22px; }
+      .letter-shell { padding: max(10px, env(safe-area-inset-top)) 8px max(10px, env(safe-area-inset-bottom)); }
+      .letter {
+        width: 100%;
+        max-height: calc(100svh - 20px);
+        border-radius: 14px;
+        padding: 34px 22px 30px;
+      }
+      .letter-top { margin-bottom: 24px; }
+      .letter-top h2 { font-size: clamp(28px, 9vw, 36px); }
+      .letter-body { font-size: clamp(16px, 4.4vw, 18px); line-height: 1.9; }
+      .note { font-size: 12px; }
+      .seal { width: 60px; height: 60px; font-size: 20px; }
+    }
+
+    @media (max-height: 700px) and (max-width: 540px) {
+      .landing { min-height: auto; }
+      .eyebrow { margin-bottom: 8px; }
+      h1 { font-size: clamp(25px, 7.9vw, 31px); }
+      .sub { margin-top: 8px; padding-top: 10px; }
+      .bird-stage { height: 178px; margin: 9px auto 0; }
+      .bird-wrap { width: min(292px, 78vw); }
+      .open-btn { padding-block: 12px; }
+      .hint { margin-top: 8px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="feather f1"></div>
+  <div class="feather f2"></div>
+  <div class="feather f3"></div>
+
+  <main class="scene">
+    <div class="cloud one"><span></span></div>
+    <div class="cloud two"><span></span></div>
+
+    <section class="landing" id="landing" aria-labelledby="pageTitle">
+      <p class="eyebrow">부엉이 우편 · 방금 도착</p>
+      <h1 id="pageTitle">편지가 도착했습니다</h1>
+      <p class="sub">멀리서 날아온 부엉이가 작은 소식을 전해왔습니다.</p>
+
+      <div class="bird-stage" aria-hidden="true">
+        <svg class="bird-wrap" viewBox="0 0 520 320" role="img" aria-label="두루마리 편지를 들고 날아온 부엉이">
+          <defs>
+            <linearGradient id="bodyG" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#aa967f"/>
+              <stop offset=".52" stop-color="#7a6859"/>
+              <stop offset="1" stop-color="#4f433a"/>
+            </linearGradient>
+            <linearGradient id="wingG" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#8d7865"/>
+              <stop offset="1" stop-color="#584a40"/>
+            </linearGradient>
+            <linearGradient id="paperG" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#fff5d9"/>
+              <stop offset="1" stop-color="#e8d3a7"/>
+            </linearGradient>
+          </defs>
+
+          <g class="wing-left">
+            <path d="M174 122 C105 102, 55 122, 23 164 C64 170, 101 194, 138 234 C145 181, 156 151, 188 136 Z" fill="url(#wingG)"/>
+            <path d="M155 142 C109 143 74 154 49 177" stroke="#b5a28f" stroke-width="8" stroke-linecap="round" opacity=".42" fill="none"/>
+            <path d="M146 170 C105 176 84 188 70 200" stroke="#a6927f" stroke-width="7" stroke-linecap="round" opacity=".35" fill="none"/>
+          </g>
+
+          <g class="wing-right">
+            <path d="M345 122 C414 102, 465 122, 497 164 C455 170, 418 194, 381 234 C375 181, 364 151, 332 136 Z" fill="url(#wingG)"/>
+            <path d="M364 142 C410 143 445 154 470 177" stroke="#b5a28f" stroke-width="8" stroke-linecap="round" opacity=".42" fill="none"/>
+            <path d="M373 170 C414 176 435 188 449 200" stroke="#a6927f" stroke-width="7" stroke-linecap="round" opacity=".35" fill="none"/>
+          </g>
+
+          <ellipse cx="260" cy="170" rx="112" ry="103" fill="url(#bodyG)"/>
+          <path d="M191 107 Q216 57 260 82 Q304 57 329 107 Q294 92 260 104 Q226 92 191 107Z" fill="#5c4c40"/>
+
+          <ellipse cx="221" cy="137" rx="40" ry="42" fill="#d5c4a7"/>
+          <ellipse cx="299" cy="137" rx="40" ry="42" fill="#d5c4a7"/>
+          <ellipse cx="221" cy="138" rx="20" ry="23" fill="#1f1d1a"/>
+          <ellipse cx="299" cy="138" rx="20" ry="23" fill="#1f1d1a"/>
+          <circle cx="214" cy="130" r="7" fill="#f5efe5"/>
+          <circle cx="292" cy="130" r="7" fill="#f5efe5"/>
+          <path d="M251 157 L269 157 L260 176 Z" fill="#d49748"/>
+
+          <path d="M187 197 C211 219, 231 229, 260 231 C289 229, 309 219, 333 197 C319 250, 293 271, 260 276 C227 271, 201 250, 187 197Z" fill="#665448" opacity=".86"/>
+          <path d="M219 218 Q260 236 301 218" stroke="#baa78f" stroke-width="6" stroke-linecap="round" fill="none" opacity=".45"/>
+
+          <g class="scroll-mini">
+            <path d="M178 245 C225 234 294 234 341 245 L336 292 C293 300 227 300 183 292 Z" fill="url(#paperG)" stroke="#b59b6f" stroke-width="3"/>
+            <ellipse cx="182" cy="268" rx="12" ry="25" fill="#dac497" stroke="#b59b6f" stroke-width="3"/>
+            <ellipse cx="338" cy="268" rx="12" ry="25" fill="#dac497" stroke="#b59b6f" stroke-width="3"/>
+            <path d="M225 258 H295" stroke="#8a765d" stroke-width="4" stroke-linecap="round" opacity=".6"/>
+            <path d="M235 271 H285" stroke="#8a765d" stroke-width="4" stroke-linecap="round" opacity=".42"/>
+            <circle cx="260" cy="292" r="12" fill="#9d3430"/>
+          </g>
+
+          <path d="M217 263 C207 270, 201 277, 198 288" stroke="#3f342d" stroke-width="7" stroke-linecap="round"/>
+          <path d="M303 263 C313 270, 319 277, 322 288" stroke="#3f342d" stroke-width="7" stroke-linecap="round"/>
+        </svg>
+      </div>
+
+      <button class="open-btn" id="openBtn" type="button">편지 보기</button>
+      <div class="hint">버튼을 누르면 편지가 펼쳐집니다.</div>
+    </section>
+
+    <section class="letter-shell" id="letterShell" aria-hidden="true">
+      <article class="letter" id="letter" tabindex="-1">
+        <header class="letter-top">
+          <span class="tiny">DELIVERED JUST NOW</span>
+          <h2>소식을 전합니다</h2>
+          <div class="divider"></div>
+        </header>
+
+        <div class="letter-body">
+          <p>
+            현재 <strong>법짱(안초희)</strong>과 <strong>1학기 자전짱(박서연)</strong>이 각각
+            <strong>정후보·부후보를 꾸리게 됐고</strong>, 남자 부후보를 한 명 더 구하고 있다고 합니다.
+          </p>
+
+          <p>
+            <strong>손승민</strong>도 확정은 아니지만 선본을 꾸리기 위해 연락을 돌리고 있다는 소식입니다.
+          </p>
+
+          <p>
+            저도 방금 들은 정보입니다.
+          </p>
+
+          <div class="note">
+            ※ 전해 들은 내용을 옮긴 것으로, 이후 상황에 따라 달라질 수 있습니다.
+          </div>
+        </div>
+
+        <div class="seal" aria-hidden="true">傳</div>
+        <button class="close-btn" id="closeBtn" type="button">편지 접기</button>
+      </article>
+    </section>
+  </main>
+
+  <script>
+    const body = document.body;
+    const landing = document.getElementById('landing');
+    const shell = document.getElementById('letterShell');
+    const letter = document.getElementById('letter');
+    const openBtn = document.getElementById('openBtn');
+    const closeBtn = document.getElementById('closeBtn');
+
+    function openLetter() {
+      body.classList.add('opened');
+      landing.classList.add('hide');
+      shell.classList.add('show');
+      shell.setAttribute('aria-hidden', 'false');
+      setTimeout(() => letter.focus({ preventScroll: true }), 520);
+    }
+
+    function closeLetter() {
+      shell.classList.remove('show');
+      shell.setAttribute('aria-hidden', 'true');
+      body.classList.remove('opened');
+      setTimeout(() => {
+        landing.classList.remove('hide');
+        openBtn.focus({ preventScroll: true });
+      }, 260);
+    }
+
+    openBtn.addEventListener('click', openLetter);
+    closeBtn.addEventListener('click', closeLetter);
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && shell.classList.contains('show')) {
+        closeLetter();
+      }
+    });
+  </script>
+</body>
+</html>
